@@ -9,6 +9,7 @@
 
     <TextView
         android:id="@+id/tv_clock"
+        android:visibility="invisible"
         android:text="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -19,6 +20,19 @@
         android:layout_margin="20dp"
         android:textSize="20sp"
         />
+
+    <TextView
+    android:id="@+id/tv_start"
+    android:text="시작"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    android:layout_margin="20dp"
+    android:textSize="20sp"
+    />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".MUpdateService" />
+        <service android:name=".Service.DownloadUpdateService" />
 
         <receiver
             android:name=".ReservedUpdateReceiver"

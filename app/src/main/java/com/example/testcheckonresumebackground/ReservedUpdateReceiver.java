@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.testcheckonresumebackground.Service.DownloadUpdateService;
+
 public class ReservedUpdateReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -12,7 +14,7 @@ public class ReservedUpdateReceiver extends BroadcastReceiver {
 
         if (intent.getAction().equals(Constants.ACTION_RESERVE_RECEIVE)){
             Log.d("Receiver", "### ReservedUpdateReceiver");
-            Intent reservedUpdateIntent = new Intent(context, MUpdateService.class);
+            Intent reservedUpdateIntent = new Intent(context, DownloadUpdateService.class);
             context.startService(reservedUpdateIntent);
         }
     }

@@ -20,9 +20,8 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun initClickListener(){
-        binding.tvClock.setOnClickListener {
-            ReserveAlarmManager().reserve(this, 1000 * 5)
-            finish()
+        binding.tvStart.setOnClickListener {
+
         }
     }
 }

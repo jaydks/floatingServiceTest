@@ -1,4 +1,4 @@
-package com.example.testcheckonresumebackground;
+package com.example.testcheckonresumebackground.Service;
 
 import static android.app.PendingIntent.FLAG_IMMUTABLE;
 
@@ -15,8 +15,8 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -24,13 +24,19 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.testcheckonresumebackground.Activity.MainActivity;
+import com.example.testcheckonresumebackground.R;
+import com.example.testcheckonresumebackground.databinding.FloatingLayoutBinding;
 
 
-public class MUpdateService extends Service {
+public class DownloadUpdateService extends Service {
+
     private static final int NOTIFICATION_ID = 1;
     private WindowManager windowManager;
     private View floatingView;
-
+    private int initialX;
+    private int initialY;
+    private float initialTouchX;
+    private float initialTouchY;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         checkOverlayPermission();
@@ -38,7 +44,6 @@ public class MUpdateService extends Service {
 
         Log.d("MUpdateService", "MUpdateService");
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        floatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
 
         int LAYOUT_FLAG;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -54,7 +59,58 @@ public class MUpdateService extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
         );
-        windowManager.addView(floatingView, params);
+
+
+        if (floatingView == null) {
+            floatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
+            floatingView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    switch (event.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            initialX = params.x;
+                            initialY = params.y;
+                            initialTouchX = event.getRawX();
+                            initialTouchY = event.getRawY();
+                            return true;
+                        case MotionEvent.ACTION_MOVE:
+                            int offsetX = (int) (event.getRawX() - initialTouchX);
+                            int offsetY = (int) (event.getRawY() - initialTouchY);
+                            params.x = initialX + offsetX;
+                            params.y = initialY + offsetY;
+                            windowManager.updateViewLayout(floatingView, params);
+                            return true;
+                    }
+                    return false;
+                }
+            });
+
+
+            windowManager.addView(floatingView, params);
+
+            floatingView.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener(){
+
+                @Override
+                public void onClick(View v) {
+                    stopSelf();
+                }
+            });
+
+
+
+
+
+
+
+
+        } else {
+            Log.d("floatingView", "already exist");
+        }
+
+
+
+        // 플로팅 뷰 터치 이벤트 처리
+
 
         startForeground(NOTIFICATION_ID, buildNotification());
 
