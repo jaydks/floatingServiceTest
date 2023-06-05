@@ -24,7 +24,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
 import com.example.testcheckonresumebackground.Activity.MainActivity;
+import com.example.testcheckonresumebackground.Activity.ProgressReceiver;
+import com.example.testcheckonresumebackground.Constants;
 import com.example.testcheckonresumebackground.R;
+import com.example.testcheckonresumebackground.ReservedUpdateReceiver;
 import com.example.testcheckonresumebackground.databinding.FloatingLayoutBinding;
 
 
@@ -43,69 +46,75 @@ public class DownloadUpdateService extends Service {
 
 
         Log.d("MUpdateService", "MUpdateService");
-        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-
-        int LAYOUT_FLAG;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
-        }
-
-        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                LAYOUT_FLAG,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT
-        );
 
 
-        if (floatingView == null) {
-            floatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
-            floatingView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    switch (event.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            initialX = params.x;
-                            initialY = params.y;
-                            initialTouchX = event.getRawX();
-                            initialTouchY = event.getRawY();
-                            return true;
-                        case MotionEvent.ACTION_MOVE:
-                            int offsetX = (int) (event.getRawX() - initialTouchX);
-                            int offsetY = (int) (event.getRawY() - initialTouchY);
-                            params.x = initialX + offsetX;
-                            params.y = initialY + offsetY;
-                            windowManager.updateViewLayout(floatingView, params);
-                            return true;
-                    }
-                    return false;
-                }
-            });
+        String percent = intent.getStringExtra(Constants.ACTION_SEND_PERCENT);
+        sendPercentBroadCast(percent);
 
-
-            windowManager.addView(floatingView, params);
-
-            floatingView.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener(){
-
-                @Override
-                public void onClick(View v) {
-                    stopSelf();
-                }
-            });
-
-
-
-
-
-
-
-
-        } else {
-            Log.d("floatingView", "already exist");
-        }
+//        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+//
+//        int LAYOUT_FLAG;
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+//        } else {
+//            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
+//        }
+//
+//        WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+//                WindowManager.LayoutParams.WRAP_CONTENT,
+//                WindowManager.LayoutParams.WRAP_CONTENT,
+//                LAYOUT_FLAG,
+//                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+//                PixelFormat.TRANSLUCENT
+//        );
+//
+//
+//        if (floatingView == null) {
+//            floatingView = LayoutInflater.from(this).inflate(R.layout.floating_layout, null);
+//            floatingView.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    switch (event.getAction()) {
+//                        case MotionEvent.ACTION_DOWN:
+//                            initialX = params.x;
+//                            initialY = params.y;
+//                            initialTouchX = event.getRawX();
+//                            initialTouchY = event.getRawY();
+//                            return true;
+//                        case MotionEvent.ACTION_MOVE:
+//                            int offsetX = (int) (event.getRawX() - initialTouchX);
+//                            int offsetY = (int) (event.getRawY() - initialTouchY);
+//                            params.x = initialX + offsetX;
+//                            params.y = initialY + offsetY;
+//                            windowManager.updateViewLayout(floatingView, params);
+//                            return true;
+//                    }
+//                    return false;
+//                }
+//            });
+//
+//
+//
+//            windowManager.addView(floatingView, params);
+//
+//            floatingView.findViewById(R.id.btn_close).setOnClickListener(new View.OnClickListener(){
+//
+//                @Override
+//                public void onClick(View v) {
+//                    stopSelf();
+//                }
+//            });
+//
+//
+//
+//
+//
+//
+//
+//
+//        } else {
+//            Log.d("floatingView", "already exist");
+//        }
 
 
 
@@ -116,14 +125,24 @@ public class DownloadUpdateService extends Service {
 
 
 
-        TextView tvClock = (TextView) floatingView.findViewById(R.id.tv_clock);
-        //tvClock.setOnClickListener();
+        // TextView tvClock = (TextView) floatingView.findViewById(R.id.tv_clock);
 
 
 
 
         // Service 로직을 실행합니다.
         return START_STICKY;
+    }
+
+    private void sendPercentBroadCast(String percent){
+        Intent broadcastIntent = new Intent(this, ProgressReceiver.class);
+
+        broadcastIntent.putExtra("progressPercent", percent);
+
+        broadcastIntent.setAction(Constants.ACTION_UPDATE_PROGRESS);
+
+        this.sendBroadcast(broadcastIntent);
+
     }
 
     private void checkOverlayPermission() {

@@ -17,13 +17,15 @@
         tools:targetApi="31">
         <activity
             android:name=".Activity.SecondActivity"
-            android:exported="true" >
+            android:exported="true">
 
 
         </activity>
         <activity
             android:name=".Activity.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Transparent">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -37,9 +39,18 @@
             android:name=".ReservedUpdateReceiver"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.wjthinkbig.minstaller2.ACT_RESERVED_UPDATE_RECEIVER" />
+                <action android:name="com.example.testcheckonresumebackground.ACT_RESERVED_UPDATE_RECEIVER" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".Activity.ProgressReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.testcheckonresumebackground.ACTION_UPDATE_PROGRESS" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>
